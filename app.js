@@ -1,5 +1,5 @@
 /** Simple demo Express app. */
-const {findMean, findMode, findMedian} = require("./stats");
+const { findMean, findMode, findMedian } = require("./stats");
 const express = require("express");
 const app = express();
 
@@ -12,9 +12,23 @@ const MISSING = "Expected key `nums` with comma-separated list of numbers.";
 
 
 /** Finds mean of nums in querystring: returns {operation: "mean", result } */
-app.get("/mean", function(req, res){
+app.get("/mean", function (req, res) {
+  // pull and convert incoming numbers into an array of numbers
   const data = req.query.nums;
-  console.log(typeof data);
+
+  if (!data) {
+    throw new BadRequestError("nums are required");
+  }
+
+  // convert data into an array of objects
+  const dataArr = data.split(',');
+  const dataArrNums = dataArr.map(function (str) {
+    return parseInt(str);
+  });
+
+  const mean = findMean(dataArrNums);
+
+  return res.json({ response: { operation: "mean", value: mean } });
 })
 
 /** Finds median of nums in qs: returns {operation: "median", result } */
