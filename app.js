@@ -1,6 +1,7 @@
 /** Simple demo Express app. */
 const { findMean, findMode, findMedian } = require("./stats");
 const express = require("express");
+const {convertStrNums} = require("./utils");
 const app = express();
 
 app.use(express.json());
@@ -10,29 +11,37 @@ const { NotFoundError, BadRequestError } = require("./expressError");
 
 const MISSING = "Expected key `nums` with comma-separated list of numbers.";
 
-
 /** Finds mean of nums in querystring: returns {operation: "mean", result } */
 app.get("/mean", function (req, res) {
   // pull and convert incoming numbers into an array of numbers
   const data = req.query.nums;
-
-  if (!data) {
-    throw new BadRequestError("nums are required");
-  }
+  if (!data) throw new BadRequestError(MISSING);
 
   // convert data into an array of objects
   const dataArr = data.split(',');
-  const dataArrNums = dataArr.map(function (str) {
-    return parseInt(str);
-  });
-
+  const dataArrNums = convertStrNums(dataArr);
   const mean = findMean(dataArrNums);
 
   return res.json({ response: { operation: "mean", value: mean } });
 })
 
-/** Finds median of nums in qs: returns {operation: "median", result } */
 
+/** Finds median of nums in qs: returns {operation: "median", result } */
+app.get("/median", function (req, res) {
+  // pull and convert incoming numbers into an array of numbers
+  const data = req.query.nums;
+
+  if (!data) {
+    throw new BadRequestError(MISSING);
+  }
+
+  // convert data into an array of objects
+  const dataArr = data.split(',');
+  const dataArrNums = convertStrNums(dataArr);
+  const mean = findMedian(dataArrNums);
+
+  return res.json({ response: { operation: "median", value: mean } });
+})
 
 /** Finds mode of nums in qs: returns {operation: "mean", result } */
 
